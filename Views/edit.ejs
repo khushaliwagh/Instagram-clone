@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <h2>Edit your post</h2>
+
+
+    <div>
+
+        <% if (post.image) { %>
+            <div class="image-box">
+                <img src="/uploads/<%= post.image %>">
+                <div class="username">@<%= post.username %>
+                        <p>
+                            <%= post.content %>
+                        </p>
+                        <form action="/posts/<%= post.id %>?_method=PATCH" method="POST" enctype="multipart/form-data">
+
+                            <textarea name="content" rows="6" cols="40"><%= post.content %></textarea>
+                            <br><br>
+
+                            <input type="file" name="image">
+                            <br><br>
+
+                            <button type="submit">Update</button>
+                        </form>
+
+                </div>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</body>
+
+</html>

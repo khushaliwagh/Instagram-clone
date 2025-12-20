@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <h1>INSTAGRAM PAGE</h1>
+
+    <% for (let post of posts) { %>
+        <div>
+
+            <% if (post.image) { %>
+                <div class="image-box">
+                    <img src="/uploads/<%= post.image %>">
+                    <div class="username">@<%= post.username %>
+                            <p>
+                                <%= post.content %>
+                            </p>
+                    </div>
+                </div>
+                <div class="i">
+                    <a href="http://localhost:8080/posts/<%=post.id%>">See in detail</a>
+                    <a href="http://localhost:8080/posts/<%=post.id%>/edit">edit</a>
+                     <a href="/posts/new">Create Post</a>
+               
+                  <form class="a2" method="POST" action="/posts/<%= post.id %>?_method=DELETE">
+                            <button style="background-image: linear-gradient(to bottom, rgb(255, 132, 0), rgb(221, 0, 255));" >Delete Post</button>
+                        </form>
+                        
+  </div>
+                <% } %>
+        </div>
+
+        <% } %>
+
+            
+
+            
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+      <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+     <h2>Here is your post in detail</h2>
+
+    <p class="a1">Post ID: <%= post.id %></p>
+
+    <% if (post.image) { %>
+                <div class="image-box">
+                    <img src="/uploads/<%= post.image %>">
+                    <div class="username">@<%= post.username %>
+                            <div>
+                                <a href="">Posts</a>
+                                <a href="">Followers</a>
+                                <a href="">Following</a>
+                            </div>
+
+                    </div>
+                </div>
+                <% } %>
+                    <p>
+                        <%= post.content %>
+                    </p>
+        </div>
+      
+</body>
+</html>

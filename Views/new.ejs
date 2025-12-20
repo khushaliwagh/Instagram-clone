@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>New Post</h2>
+
+    <form action="/posts" method="POST" enctype="multipart/form-data">
+        <input type="text" name="username" placeholder="username" required><br><br>
+        <textarea name="content" placeholder="content" required></textarea><br><br>
+        <input type="file" name="image" required><br><br>
+        <button>Create</button>
+    </form>
+</body>
+</html>
