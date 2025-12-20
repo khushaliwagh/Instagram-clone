@@ -1,9 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+   
+    margin: 0;
+    padding: 0;
+}
 
+.nav {
+    
+    height: 50px;
+    width: 1550px;
+    margin-bottom:10px ;
+    background: linear-gradient(180deg, #ff8400, #dd00ff);
+}
 
 
 /* Image container */
 .image-box {
     position: relative;
+    
     
 }
 .a1{
@@ -13,9 +31,10 @@
 /* Username over image */
 .username {
     position: absolute;
-    bottom:0px;
+    bottom:10pxpx;
     top: 15px;
-    left: 180px;
+    left: 620px;
+    align-items: center;
     color: rgb(8, 8, 8);
     font-weight: bold;
     font-size: 18px;
@@ -25,7 +44,7 @@
 
 a{
      position: relative;
-      top: 25px;
+     top: 30px;
      padding: 20px 10px;
      text-decoration: none;
      font-weight: bold;
@@ -33,7 +52,7 @@ a{
 }
 .i{
     position: relative;
-    left: 180px; 
+    left: 600px; 
     bottom:35px;
     font-weight: bold;
     font-size: 18px;
@@ -52,5 +71,6 @@ a{
 .image-box img {
     width: 150px;
     border-radius: 150px;
+    margin-left: 450px;
     
 }
