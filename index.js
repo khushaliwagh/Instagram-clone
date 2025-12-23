@@ -8,58 +8,38 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const methodOverride = require("method-override");
 
-// =======================
-// VERCEL SAFETY FLAGS
-// =======================
-const isVercel = process.env.VERCEL === "1";
-
-// =======================
-// VIEW ENGINE
-// =======================
+//  view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// =======================
-// BODY PARSER
-// =======================
+
+// body parser FIRST
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// =======================
-// METHOD OVERRIDE
-// =======================
+// THEN method override
 app.use(methodOverride("_method"));
 
-// =======================
-// STATIC FILES (SAFE)
-// =======================
+// static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// =======================
-// MULTER (FIXED FOR VERCEL)
-// =======================
-let upload;
 
-if (isVercel) {
-  // Vercel cannot write files → prevent crash
-  upload = multer({ storage: multer.memoryStorage() });
-} else {
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "public/uploads");
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
-    }
-  });
-  upload = multer({ storage });
-}
+//  Multer config (unchanged)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
-// =======================
-// GLOBAL MEMORY (NO CRASH)
-// =======================
-global.posts = global.posts || [
+const upload = multer({ storage });
+
+
+//  Data
+let posts = [
   {
     id: uuidv4(),
     image: "cat.jpg",
@@ -86,11 +66,8 @@ global.posts = global.posts || [
   }
 ];
 
-let posts = global.posts;
 
-// =======================
-// ROUTES (UNCHANGED)
-// =======================
+// Routes
 app.get("/posts", (req, res) => {
   res.render("index", { posts });
 });
@@ -100,12 +77,16 @@ app.get("/posts/new", (req, res) => {
 });
 
 app.post("/posts", upload.single("image"), (req, res) => {
+  console.log(req.file);
+
   posts.push({
     id: uuidv4(),
     username: req.body.username,
     content: req.body.content,
-    image: req.file ? req.file.originalname : "default.png"
+   image: req.file ? req.file.originalname : null
+
   });
+
   res.redirect("/posts");
 });
 
@@ -113,6 +94,7 @@ app.get("/posts/:id", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
   res.render("show.ejs", { post });
 });
+
 
 app.get("/posts/:id/edit", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
@@ -125,6 +107,8 @@ app.patch("/posts/:id", upload.single("image"), (req, res) => {
   if (!post) return res.status(404).send("Post not found");
 
   post.content = req.body.content;
+
+  // ONLY update image if new image uploaded
   if (req.file && req.file.originalname) {
     post.image = req.file.originalname;
   }
@@ -132,22 +116,22 @@ app.patch("/posts/:id", upload.single("image"), (req, res) => {
   res.redirect("/posts");
 });
 
+
 app.delete("/posts/:id", (req, res) => {
   posts = posts.filter(p => p.id !== req.params.id);
-  global.posts = posts;
   res.redirect("/posts");
 });
 
-// =======================
-// LOCAL ONLY LISTEN
-// =======================
-if (!isVercel) {
+//  DO NOT listen on Vercel
+// app.listen(port, () => {
+//   console.log("Server running on http://localhost:8080/posts");
+// });
+
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 8080;
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/posts`);
   });
 }
 
-// =======================
-// REQUIRED FOR VERCEL
-// =======================
 module.exports = app;
