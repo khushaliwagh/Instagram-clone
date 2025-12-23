@@ -8,18 +8,18 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const methodOverride = require("method-override");
 
-// ✅ view engine
+//  view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// ✅ middleware
+//  middleware
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // ✅ MUST be before routes on Vercel
+app.use(express.json()); //  MUST be before routes on Vercel
 
-// ✅ Multer config (unchanged)
+//  Multer config (unchanged)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/uploads");
@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ Data
+//  Data
 let posts = [
   {
     id: uuidv4(),
@@ -58,7 +58,7 @@ let posts = [
   }
 ];
 
-// ✅ Routes
+// Routes
 app.get("/posts", (req, res) => {
   res.render("index", { posts });
 });
@@ -106,7 +106,7 @@ app.delete("/posts/:id", (req, res) => {
   res.redirect("/posts");
 });
 
-// ❌ DO NOT listen on Vercel
+//  DO NOT listen on Vercel
 // app.listen(port, () => {
 //   console.log("Server running on http://localhost:8080/posts");
 // });
