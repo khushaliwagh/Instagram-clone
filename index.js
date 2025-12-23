@@ -12,12 +12,18 @@ const methodOverride = require("method-override");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-//  middleware
+
+// body parser FIRST
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// THEN method override
 app.use(methodOverride("_method"));
+
+// static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); //  MUST be before routes on Vercel
+
 
 //  Multer config (unchanged)
 const storage = multer.diskStorage({
@@ -28,7 +34,9 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
+
 const upload = multer({ storage });
+
 
 //  Data
 let posts = [
@@ -58,7 +66,8 @@ let posts = [
   }
 ];
 
-// routes
+
+// Routes
 app.get("/posts", (req, res) => {
   res.render("index", { posts });
 });
@@ -68,11 +77,14 @@ app.get("/posts/new", (req, res) => {
 });
 
 app.post("/posts", upload.single("image"), (req, res) => {
+  console.log(req.file);
+
   posts.push({
     id: uuidv4(),
     username: req.body.username,
     content: req.body.content,
-    image: null // no disk uploads on Vercel
+   image: req.file ? req.file.originalname : null
+
   });
 
   res.redirect("/posts");
@@ -80,36 +92,9 @@ app.post("/posts", upload.single("image"), (req, res) => {
 
 app.get("/posts/:id", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
-  res.render("show", { post });
+  res.render("show.ejs", { post });
 });
 
-
-// // Routes
-// app.get("/posts", (req, res) => {
-//   res.render("index", { posts });
-// });
-
-// app.get("/posts/new", (req, res) => {
-//   res.render("new");
-// });
-
-// app.post("/posts", upload.single("image"), (req, res) => {
-//   console.log(req.file);
-
-//   posts.push({
-//     id: uuidv4(),
-//     username: req.body.username,
-//     content: req.body.content,
-//     image: req.file ? req.file.filename : null
-//   });
-
-//   res.redirect("/posts");
-// });
-
-// app.get("/posts/:id", (req, res) => {
-//   const post = posts.find(p => p.id === req.params.id);
-//   res.render("show.ejs", { post });
-// });
 
 app.get("/posts/:id/edit", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
@@ -122,10 +107,15 @@ app.patch("/posts/:id", upload.single("image"), (req, res) => {
   if (!post) return res.status(404).send("Post not found");
 
   post.content = req.body.content;
-  if (req.file) post.image = req.file.filename;
+
+  // ONLY update image if new image uploaded
+  if (req.file && req.file.originalname) {
+    post.image = req.file.originalname;
+  }
 
   res.redirect("/posts");
 });
+
 
 app.delete("/posts/:id", (req, res) => {
   posts = posts.filter(p => p.id !== req.params.id);
