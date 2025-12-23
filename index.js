@@ -58,7 +58,7 @@ let posts = [
   }
 ];
 
-// Routes
+// routes
 app.get("/posts", (req, res) => {
   res.render("index", { posts });
 });
@@ -68,13 +68,11 @@ app.get("/posts/new", (req, res) => {
 });
 
 app.post("/posts", upload.single("image"), (req, res) => {
-  console.log(req.file);
-
   posts.push({
     id: uuidv4(),
     username: req.body.username,
     content: req.body.content,
-    image: req.file ? req.file.filename : null
+    image: null // no disk uploads on Vercel
   });
 
   res.redirect("/posts");
@@ -82,8 +80,36 @@ app.post("/posts", upload.single("image"), (req, res) => {
 
 app.get("/posts/:id", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
-  res.render("show.ejs", { post });
+  res.render("show", { post });
 });
+
+
+// // Routes
+// app.get("/posts", (req, res) => {
+//   res.render("index", { posts });
+// });
+
+// app.get("/posts/new", (req, res) => {
+//   res.render("new");
+// });
+
+// app.post("/posts", upload.single("image"), (req, res) => {
+//   console.log(req.file);
+
+//   posts.push({
+//     id: uuidv4(),
+//     username: req.body.username,
+//     content: req.body.content,
+//     image: req.file ? req.file.filename : null
+//   });
+
+//   res.redirect("/posts");
+// });
+
+// app.get("/posts/:id", (req, res) => {
+//   const post = posts.find(p => p.id === req.params.id);
+//   res.render("show.ejs", { post });
+// });
 
 app.get("/posts/:id/edit", (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
@@ -110,5 +136,12 @@ app.delete("/posts/:id", (req, res) => {
 // app.listen(port, () => {
 //   console.log("Server running on http://localhost:8080/posts");
 // });
+
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 8080;
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}/posts`);
+  });
+}
 
 module.exports = app;
